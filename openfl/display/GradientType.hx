@@ -1,4 +1,15 @@
-package openfl.display; #if !flash
+package openfl.display; #if (!display && !flash)
+
+
+enum GradientType {
+	
+	RADIAL;
+	LINEAR;
+	
+}
+
+
+#else
 
 
 /**
@@ -7,7 +18,12 @@ package openfl.display; #if !flash
  * <code>lineGradientStyle()</code> methods of the openfl.display.Graphics
  * class.
  */
-enum GradientType {
+
+#if flash
+@:native("flash.display.GradientType")
+#end
+
+@:fakeEnum(String) extern enum GradientType {
 	
 	/**
 	 * Value used to specify a radial gradient fill.
@@ -22,6 +38,4 @@ enum GradientType {
 }
 
 
-#else
-typedef GradientType = flash.display.GradientType;
 #end

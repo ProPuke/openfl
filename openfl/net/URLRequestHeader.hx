@@ -1,4 +1,25 @@
-package openfl.net; #if !flash
+package openfl.net; #if (!display && !flash)
+
+
+@:final class URLRequestHeader {
+	
+	
+	public var name:String;
+	public var value:String;
+	
+	
+	public function new (name:String = "", value:String = "") {
+		
+		this.name = name;
+		this.value = value;
+		
+	}
+	
+	
+}
+
+
+#else
 
 
 /**
@@ -68,7 +89,13 @@ package openfl.net; #if !flash
  * supported for <code>POST</code> requests, not for <code>GET</code>
  * requests.</p>
  */
-@:final class URLRequestHeader {
+
+#if flash
+@:native("flash.net.URLRequestHeader")
+#end
+
+
+@:final extern class URLRequestHeader {
 	
 	
 	/**
@@ -94,17 +121,10 @@ package openfl.net; #if !flash
 	 * @param value The value associated with the <code>name</code> property
 	 *             (such as <code>text/plain</code>).
 	 */
-	public function new (name:String = "", value:String = "") {
-		
-		this.name = name;
-		this.value = value;
-		
-	}
+	public function new (name:String = "", value:String = "");
 	
 	
 }
 
 
-#else
-typedef URLRequestHeader = flash.net.URLRequestHeader;
 #end

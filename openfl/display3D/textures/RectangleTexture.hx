@@ -1,4 +1,4 @@
-package openfl.display3D.textures; #if !flash
+package openfl.display3D.textures; #if (!display && !flash)
 
 
 import openfl.display.BitmapData;
@@ -50,10 +50,8 @@ import openfl.utils.UInt8Array;
 		
 		#if openfl_legacy
 		var p = BitmapData.getRGBAPixels (bitmapData);
-		#elseif js
-		var p = ByteArrayData.__ofBuffer (bitmapData.image.data.buffer);
 		#else
-		var p = ByteArray.fromBytes (bitmapData.image.data.buffer);
+		var p:ByteArray = bitmapData.image.data.buffer;
 		#end
 		
 		width = bitmapData.width;
@@ -121,5 +119,24 @@ import openfl.utils.UInt8Array;
 
 
 #else
-typedef RectangleTexture = flash.display3D.textures.RectangleTexture;
+
+
+import openfl.display.BitmapData;
+import openfl.utils.ByteArray;
+
+#if flash
+@:native("flash.display3D.textures.RectangleTexture")
+#end
+
+@:final extern class RectangleTexture extends TextureBase {
+	
+	
+	public function new ():Void;
+	public function uploadFromBitmapData (source:BitmapData):Void;
+	public function uploadFromByteArray (data:ByteArray, byteArrayOffset:UInt):Void;
+	
+	
+}
+
+
 #end

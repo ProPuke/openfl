@@ -1,7 +1,7 @@
-package openfl.utils; #if !flash
+package openfl.utils;
 
 
-@:forward() abstract Object(Dynamic) from Dynamic to Dynamic {
+@:forward() abstract Object(ObjectType) from ObjectType {
 	
 	
 	public inline function new () {
@@ -34,9 +34,18 @@ package openfl.utils; #if !flash
 	}
 	
 	
+	@:noCompletion @:dox(hide) public function iterator ():Iterator<String> {
+		
+		var fields = Reflect.fields (this);
+		if (fields == null) fields = [];
+		return fields.iterator ();
+		
+	}
+	
+	
 	public inline function propertyIsEnumerable (name:String):Bool {
 		
-		return (this != null && Reflect.hasField (this, name) && Std.is (Reflect.field (this, name), Iterable));
+		return (this != null && Reflect.hasField (this, name) && Std.is (Reflect.field (this, name), Iterable_));
 		
 	}
 	
@@ -48,7 +57,7 @@ package openfl.utils; #if !flash
 	}
 	
 	
-	public inline function toString ():String {
+	@:to public inline function toString ():String {
 		
 		return Std.string (this);
 		
@@ -62,10 +71,25 @@ package openfl.utils; #if !flash
 	}
 	
 	
+	@:arrayAccess @:noCompletion @:dox(hide) public inline function __get (key:String):Dynamic {
+		
+		return Reflect.field (this, key);
+		
+	}
+	
+	
+	@:arrayAccess @:noCompletion @:dox(hide) public inline function __set (key:String, value:Dynamic):Dynamic {
+		
+		Reflect.setField (this, key, value);
+		return value;
+		
+	}
+	
+	
 }
 
 
-@:keep @:native('haxe.lang.Iterator') private interface Iterator<T> {
+@:keep @:native('haxe.lang.Iterator') private interface Iterator_<T> {
 	
 	public function hasNext ():Bool;
 	public function next ():T;
@@ -73,13 +97,15 @@ package openfl.utils; #if !flash
 }
 
 
-@:keep @:native('haxe.lang.Iterable') private interface Iterable<T> {
+@:keep @:native('haxe.lang.Iterable') private interface Iterable_<T> {
 	
-	public function iterator ():Iterator<T>;
+	public function iterator ():Iterator_<T>;
 	
 }
 
 
+#if !flash
+typedef ObjectType = Dynamic;
 #else
-typedef Object = flash.utils.Object;
+typedef ObjectType = flash.utils.Object;
 #end

@@ -1,4 +1,50 @@
-package openfl.events; #if !flash
+package openfl.events; #if (!display && !flash)
+
+
+class ProgressEvent extends Event {
+	
+	
+	public static var PROGRESS = "progress";
+	public static var SOCKET_DATA = "socketData";
+	
+	public var bytesLoaded:Float;
+	public var bytesTotal:Float;
+	
+	
+	public function new (type:String, bubbles:Bool = false, cancelable:Bool = false, bytesLoaded:Float = 0, bytesTotal:Float = 0) {
+		
+		super (type, bubbles, cancelable);
+		
+		this.bytesLoaded = bytesLoaded;
+		this.bytesTotal = bytesTotal;
+		
+	}
+	
+	
+	public override function clone ():Event {
+		
+		var event = new ProgressEvent (type, bubbles, cancelable, bytesLoaded, bytesTotal);
+		event.target = target;
+		event.currentTarget = currentTarget;
+		#if !openfl_legacy
+		event.eventPhase = eventPhase;
+		#end
+		return event;
+		
+	}
+	
+	
+	public override function toString ():String {
+		
+		return __formatToString ("ProgressEvent",  [ "type", "bubbles", "cancelable", "bytesLoaded", "bytesTotal" ]);
+		
+	}
+	
+	
+}
+
+
+#else
 
 
 /**
@@ -11,7 +57,12 @@ package openfl.events; #if !flash
  * the NativeProcess class.
  * 
  */
-class ProgressEvent extends Event {
+
+#if flash
+@:native("flash.events.ProgressEvent")
+#end
+
+extern class ProgressEvent extends Event {
 	
 	
 	/**
@@ -20,7 +71,7 @@ class ProgressEvent extends Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var PROGRESS:String = "progress";
+	public static var PROGRESS:String;
 	
 	/**
 	 * Defines the value of the <code>type</code> property of a
@@ -28,7 +79,7 @@ class ProgressEvent extends Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var SOCKET_DATA:String = "socketData";
+	public static var SOCKET_DATA:String;
 	
 	
 	/**
@@ -64,33 +115,10 @@ class ProgressEvent extends Event {
 	 * @param bytesTotal  The total number of items or bytes that will be loaded
 	 *                    if the loading process succeeds.
 	 */
-	public function new (type:String, bubbles:Bool = false, cancelable:Bool = false, bytesLoaded:Float = 0, bytesTotal:Float = 0) {
-		
-		super (type, bubbles, cancelable);
-		
-		this.bytesLoaded = bytesLoaded;
-		this.bytesTotal = bytesTotal;
-		
-	}
-	
-	
-	public override function clone ():Event {
-		
-		return new ProgressEvent (type, bubbles, cancelable, bytesLoaded, bytesTotal);
-		
-	}
-	
-	
-	public override function toString ():String {
-		
-		return "[ProgressEvent type=\"" + type + "\" bubbles=" + bubbles + " cancelable=" + cancelable + " bytesLoaded=" + bytesLoaded + " bytesTotal=" + bytesTotal + "]";
-		
-	}
+	public function new (type:String, bubbles:Bool = false, cancelable:Bool = false, bytesLoaded:Float = 0, bytesTotal:Float = 0);
 	
 	
 }
 
 
-#else
-typedef ProgressEvent = flash.events.ProgressEvent;
 #end

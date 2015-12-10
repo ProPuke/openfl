@@ -1,10 +1,27 @@
-package openfl.net; #if !flash
+package openfl.net; #if (!display && !flash)
+
+
+@:fakeEnum(String) enum SharedObjectFlushStatus {
+	
+	FLUSHED;
+	PENDING;
+	
+}
+
+
+#else
 
 
 /**
  * The SharedObjectFlushStatus class provides values for the code returned
  * from a call to the <code>SharedObject.flush()</code> method.
  */
+
+#if flash
+@:native("flash.net.SharedObjectFlushStatus")
+#end
+
+
 @:fakeEnum(String) enum SharedObjectFlushStatus {
 	
 	/**
@@ -21,6 +38,4 @@ package openfl.net; #if !flash
 }
 
 
-#else
-typedef SharedObjectFlushStatus = flash.net.SharedObjectFlushStatus;
 #end

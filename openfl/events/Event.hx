@@ -1,7 +1,163 @@
-package openfl.events; #if !flash #if !openfl_legacy
+package openfl.events; #if (!display && !flash) #if !openfl_legacy
 
 
+import haxe.macro.Expr;
 import openfl.display.InteractiveObject;
+
+
+class Event {
+	
+	
+	public static var ACTIVATE = "activate";
+	public static var ADDED = "added";
+	public static var ADDED_TO_STAGE = "addedToStage";
+	public static var CANCEL = "cancel";
+	public static var CHANGE = "change";
+	public static var CLOSE = "close";
+	public static var COMPLETE = "complete";
+	public static var CONNECT = "connect";
+	public static var CONTEXT3D_CREATE = "context3DCreate";
+	public static var DEACTIVATE = "deactivate";
+	public static var ENTER_FRAME = "enterFrame";
+	public static var ID3 = "id3";
+	public static var INIT = "init";
+	public static var MOUSE_LEAVE = "mouseLeave";
+	public static var OPEN = "open";
+	public static var REMOVED = "removed";
+	public static var REMOVED_FROM_STAGE = "removedFromStage";
+	public static var RENDER = "render";
+	public static var RESIZE = "resize";
+	public static var SCROLL = "scroll";
+	public static var SELECT = "select";
+	public static var SOUND_COMPLETE = "soundComplete";
+	public static var TAB_CHILDREN_CHANGE = "tabChildrenChange";
+	public static var TAB_ENABLED_CHANGE = "tabEnabledChange";
+	public static var TAB_INDEX_CHANGE = "tabIndexChange";
+	public static var UNLOAD = "unload";
+	
+	public var bubbles (default, null):Bool;
+	public var cancelable (default, null):Bool;
+	public var currentTarget (default, null):Dynamic;
+	public var eventPhase (default, null):EventPhase;
+	public var target (default, null):Dynamic;
+	public var type (default, null):String;
+	
+	private var __isCancelled:Bool;
+	private var __isCancelledNow:Bool;
+	private var __preventDefault:Bool;
+	
+	
+	public function new (type:String, bubbles:Bool = false, cancelable:Bool = false) {
+		
+		this.type = type;
+		this.bubbles = bubbles;
+		this.cancelable = cancelable;
+		eventPhase = EventPhase.AT_TARGET;
+		
+	}
+	
+	
+	public function clone ():Event {
+		
+		var event = new Event (type, bubbles, cancelable);
+		event.eventPhase = eventPhase;
+		event.target = target;
+		event.currentTarget = currentTarget;
+		return event;
+		
+	}
+	
+	
+	public function formatToString (className:String, ?p1:String, ?p2:String, ?p3:String, ?p4:String, ?p5:String):String {
+		
+		var parameters = [];
+		if (p1 != null) parameters.push (p1);
+		if (p2 != null) parameters.push (p2);
+		if (p3 != null) parameters.push (p3);
+		if (p4 != null) parameters.push (p4);
+		if (p5 != null) parameters.push (p5);
+		
+		return Reflect.callMethod (this, __formatToString, [ className, parameters ]);
+		
+	}
+	
+	
+	public function isDefaultPrevented ():Bool {
+		
+		return __preventDefault;
+		
+	}
+	
+	
+	public function preventDefault ():Void {
+		
+		if (cancelable) {
+			
+			__preventDefault = true;
+			
+		}
+		
+	}
+	
+	
+	public function stopImmediatePropagation ():Void {
+		
+		__isCancelled = true;
+		__isCancelledNow = true;
+		
+	}
+	
+	
+	public function stopPropagation ():Void {
+		
+		__isCancelled = true;
+		
+	}
+	
+	
+	public function toString ():String {
+		
+		return __formatToString ("Event",  [ "type", "bubbles", "cancelable" ]);
+		
+	}
+	
+	
+	private function __formatToString (className:String, parameters:Array<String>):String {
+		
+		// TODO: Make this a macro function, and handle at compile-time, with rest parameters?
+		
+		var output = '[$className';
+		var arg:Dynamic = null;
+		
+		for (param in parameters) {
+			
+			arg = Reflect.field (this, param);
+			
+			if (Std.is (arg, String)) {
+				
+				output += ' $param="$arg"';
+				
+			} else {
+				
+				output += ' $param=$arg';
+				
+			}
+			
+		}
+		
+		output += "]";
+		return output;
+		
+	}
+	
+	
+}
+
+
+#else
+typedef Event = openfl._legacy.events.Event;
+#end
+#else
 
 
 /**
@@ -54,7 +210,12 @@ import openfl.display.InteractiveObject;
  * </ul>
  * 
  */
-class Event {
+
+#if flash
+@:native("flash.events.Event")
+#end
+
+extern class Event {
 	
 	
 	/**
@@ -70,7 +231,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var ACTIVATE = "activate";
+	public static var ACTIVATE:String;
 	
 	/**
 	 * The <code>Event.ADDED</code> constant defines the value of the
@@ -78,7 +239,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var ADDED = "added";
+	public static var ADDED:String;
 	
 	/**
 	 * The <code>Event.ADDED_TO_STAGE</code> constant defines the value of the
@@ -86,7 +247,11 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var ADDED_TO_STAGE = "addedToStage";
+	public static var ADDED_TO_STAGE:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash15) public static var BROWSER_ZOOM_CHANGE:String;
+	#end
 	
 	/**
 	 * The <code>Event.CANCEL</code> constant defines the value of the
@@ -94,7 +259,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var CANCEL = "cancel";
+	public static var CANCEL:String;
 	
 	/**
 	 * The <code>Event.CHANGE</code> constant defines the value of the
@@ -102,7 +267,19 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var CHANGE = "change";
+	public static var CHANGE:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) public static var CHANNEL_MESSAGE:String;
+	#end
+	
+	#if flash
+	@:noCompletion @:dox(hide) public static var CHANNEL_STATE:String;
+	#end
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash10) public static var CLEAR:String;
+	#end
 	
 	/**
 	 * The <code>Event.CLOSE</code> constant defines the value of the
@@ -110,7 +287,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var CLOSE = "close";
+	public static var CLOSE:String;
 	
 	/**
 	 * The <code>Event.COMPLETE</code> constant defines the value of the
@@ -118,7 +295,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var COMPLETE = "complete";
+	public static var COMPLETE:String;
 	
 	/**
 	 * The <code>Event.CONNECT</code> constant defines the value of the
@@ -126,8 +303,20 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var CONNECT = "connect";
-	public static var CONTEXT3D_CREATE = "context3DCreate";
+	public static var CONNECT:String;
+	
+	#if flash
+	@:require(flash11)
+	#end
+	public static var CONTEXT3D_CREATE:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash10) public static var COPY:String;
+	#end
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash10) public static var CUT:String;
+	#end
 	
 	/**
 	 * The <code>Event.DEACTIVATE</code> constant defines the value of the
@@ -142,7 +331,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var DEACTIVATE = "deactivate";
+	public static var DEACTIVATE:String;
 	
 	/**
 	 * The <code>Event.ENTER_FRAME</code> constant defines the value of the
@@ -154,7 +343,23 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var ENTER_FRAME = "enterFrame";
+	public static var ENTER_FRAME:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash10) public static var EXIT_FRAME:String;
+	#end
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash10) public static var FRAME_CONSTRUCTED:String;
+	#end
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash11_3) public static var FRAME_LABEL:String;
+	#end
+	
+	#if flash
+	@:noCompletion @:dox(hide) public static var FULLSCREEN:String;
+	#end
 	
 	/**
 	 * The <code>Event.ID3</code> constant defines the value of the
@@ -162,7 +367,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var ID3 = "id3";
+	public static var ID3:String;
 	
 	/**
 	 * The <code>Event.INIT</code> constant defines the value of the
@@ -170,7 +375,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var INIT = "init";
+	public static var INIT:String;
 	
 	/**
 	 * The <code>Event.MOUSE_LEAVE</code> constant defines the value of the
@@ -178,7 +383,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var MOUSE_LEAVE = "mouseLeave";
+	public static var MOUSE_LEAVE:String;
 	
 	/**
 	 * The <code>Event.OPEN</code> constant defines the value of the
@@ -186,7 +391,11 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var OPEN = "open";
+	public static var OPEN:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash10) public static var PASTE:String;
+	#end
 	
 	/**
 	 * The <code>Event.REMOVED</code> constant defines the value of the
@@ -194,7 +403,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var REMOVED = "removed";
+	public static var REMOVED:String;
 	
 	/**
 	 * The <code>Event.REMOVED_FROM_STAGE</code> constant defines the value of
@@ -203,7 +412,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var REMOVED_FROM_STAGE = "removedFromStage";
+	public static var REMOVED_FROM_STAGE:String;
 	
 	/**
 	 * The <code>Event.RENDER</code> constant defines the value of the
@@ -215,7 +424,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var RENDER = "render";
+	public static var RENDER:String;
 	
 	/**
 	 * The <code>Event.RESIZE</code> constant defines the value of the
@@ -223,7 +432,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var RESIZE = "resize";
+	public static var RESIZE:String;
 	
 	/**
 	 * The <code>Event.SCROLL</code> constant defines the value of the
@@ -231,7 +440,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var SCROLL = "scroll";
+	public static var SCROLL:String;
 	
 	/**
 	 * The <code>Event.SELECT</code> constant defines the value of the
@@ -239,7 +448,11 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var SELECT = "select";
+	public static var SELECT:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash10) public static var SELECT_ALL:String;
+	#end
 	
 	/**
 	 * The <code>Event.SOUND_COMPLETE</code> constant defines the value of the
@@ -247,7 +460,11 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var SOUND_COMPLETE = "soundComplete";
+	public static var SOUND_COMPLETE:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash11_3) public static var SUSPEND:String;
+	#end
 	
 	/**
 	 * The <code>Event.TAB_CHILDREN_CHANGE</code> constant defines the value of
@@ -256,7 +473,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var TAB_CHILDREN_CHANGE = "tabChildrenChange";
+	public static var TAB_CHILDREN_CHANGE:String;
 	
 	/**
 	 * The <code>Event.TAB_ENABLED_CHANGE</code> constant defines the value of
@@ -265,7 +482,7 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var TAB_ENABLED_CHANGE = "tabEnabledChange";
+	public static var TAB_ENABLED_CHANGE:String;
 	
 	/**
 	 * The <code>Event.TAB_INDEX_CHANGE</code> constant defines the value of the
@@ -273,7 +490,15 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var TAB_INDEX_CHANGE = "tabIndexChange";
+	public static var TAB_INDEX_CHANGE:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash11_3) public static var TEXTURE_READY:String;
+	#end
+	
+	#if flash
+	@:noCompletion @:dox(hide) @:require(flash11) public static var TEXT_INTERACTION_MODE_CHANGE:String;
+	#end
 	
 	/**
 	 * The <code>Event.UNLOAD</code> constant defines the value of the
@@ -281,7 +506,15 @@ class Event {
 	 *
 	 * <p>This event has the following properties:</p>
 	 */
-	public static var UNLOAD = "unload";
+	public static var UNLOAD:String;
+	
+	#if flash
+	@:noCompletion @:dox(hide) public static var VIDEO_FRAME:String;
+	#end
+	
+	#if flash
+	@:noCompletion @:dox(hide) public static var WORKER_STATE:String;
+	#end
 	
 	
 	/**
@@ -314,7 +547,7 @@ class Event {
 	 * could be the node containing that button or one of its ancestors that has
 	 * registered an event listener for that event.
 	 */
-	public var currentTarget:Dynamic;
+	public var currentTarget (default, null):Dynamic;
 	
 	/**
 	 * The current phase in the event flow. This property can contain the
@@ -332,16 +565,12 @@ class Event {
 	 * a user clicks an OK button, the target node is the display list node
 	 * containing that button.
 	 */
-	public var target:Dynamic;
+	public var target (default, null):Dynamic;
 	
 	/**
 	 * The type of event. The type is case-sensitive.
 	 */
 	public var type (default, null):String;
-	
-	@:noCompletion private var __isCancelled:Bool;
-	@:noCompletion private var __isCancelledNow:Bool;
-	@:noCompletion private var __preventDefault:Bool;
 	
 	
 	/**
@@ -355,14 +584,7 @@ class Event {
 	 * @param cancelable Determines whether the Event object can be canceled. The
 	 *                   default values is <code>false</code>.
 	 */
-	public function new (type:String, bubbles:Bool = false, cancelable:Bool = false) {
-		
-		this.type = type;
-		this.bubbles = bubbles;
-		this.cancelable = cancelable;
-		eventPhase = EventPhase.AT_TARGET;
-		
-	}
+	public function new (type:String, bubbles:Bool = false, cancelable:Bool = false);
 	
 	
 	/**
@@ -388,15 +610,10 @@ class Event {
 	 * 
 	 * @return A new Event object that is identical to the original.
 	 */
-	public function clone ():Event {
-		
-		var event = new Event (type, bubbles, cancelable);
-		event.eventPhase = eventPhase;
-		event.target = target;
-		event.currentTarget = currentTarget;
-		return event;
-		
-	}
+	public function clone ():Event;
+	
+	
+	public function formatToString (className:String, ?p1:Dynamic, ?p2:Dynamic, ?p3:Dynamic, ?p4:Dynamic, ?p5:Dynamic):String;
 	
 	
 	/**
@@ -407,11 +624,7 @@ class Event {
 	 * @return If <code>preventDefault()</code> has been called, returns
 	 *         <code>true</code>; otherwise, returns <code>false</code>.
 	 */
-	public function isDefaultPrevented ():Bool {
-		
-		return __preventDefault;
-		
-	}
+	public function isDefaultPrevented ():Bool;
 	
 	
 	/**
@@ -420,15 +633,7 @@ class Event {
 	 * An example of a behavior that is not cancelable is the default behavior associated with the Event.REMOVED event, which is generated whenever Flash Player is about to remove a display object from the display list. The default behavior (removing the element) cannot be canceled, so the <code>preventDefault()</code> method has no effect on this default behavior.
 	 * You can use the <code>Event.cancelable</code> property to check whether you can prevent the default behavior associated with a particular event. If the value of <code>Event.cancelable</code> is true, then <code>preventDefault()</code> can be used to cancel the event; otherwise, <code>preventDefault()</code> has no effect.
 	 */
-	public function preventDefault ():Void {
-		
-		if (cancelable) {
-			
-			__preventDefault = true;
-			
-		}
-		
-	}
+	public function preventDefault ():Void;
 	
 	
 	/**
@@ -442,12 +647,7 @@ class Event {
 	 * this event; see <code>preventDefault()</code> for that functionality.</p>
 	 * 
 	 */
-	public function stopImmediatePropagation ():Void {
-		
-		__isCancelled = true;
-		__isCancelledNow = true;
-		
-	}
+	public function stopImmediatePropagation ():Void;
 	
 	
 	/**
@@ -463,11 +663,7 @@ class Event {
 	 * this event; see <code>preventDefault()</code> for that functionality.</p>
 	 * 
 	 */
-	public function stopPropagation ():Void {
-		
-		__isCancelled = true;
-		
-	}
+	public function stopPropagation ():Void;
 	
 	
 	/**
@@ -479,19 +675,10 @@ class Event {
 	 * 
 	 * @return A string containing all the properties of the Event object.
 	 */
-	public function toString ():String {
-		
-		return "[Event type=\"" + type + "\" bubbles=" + bubbles + " cancelable=" + cancelable + "]";
-		
-	}
+	public function toString ():String;
 	
 	
 }
 
 
-#else
-typedef Event = openfl._legacy.events.Event;
-#end
-#else
-typedef Event = flash.events.Event;
 #end

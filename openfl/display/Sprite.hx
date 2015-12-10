@@ -11,7 +11,6 @@ import openfl.geom.Matrix;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
-
 @:access(openfl.display.Graphics)
 @:access(openfl.display.Stage)
 
@@ -58,14 +57,14 @@ class Sprite extends DisplayObjectContainer {
 	}
 	
 	
-	@:noCompletion private override function __getCursor ():MouseCursor {
+	private override function __getCursor ():MouseCursor {
 		
 		return (buttonMode && useHandCursor) ? POINTER : null;
 		
 	}
 	
 	
-	@:noCompletion private override function __hitTest (x:Float, y:Float, shapeFlag:Bool, stack:Array<DisplayObject>, interactiveOnly:Bool, hitObject:InteractiveObject):Bool {
+	private override function __hitTest (x:Float, y:Float, shapeFlag:Bool, stack:Array<DisplayObject>, interactiveOnly:Bool, hitObject:DisplayObject):Bool {
 		
 		if (hitArea != null) {
 			
@@ -78,14 +77,14 @@ class Sprite extends DisplayObjectContainer {
 			
 		} else {
 			
-			if (!hitObject.visible || __isMask || (interactiveOnly && !hitObject.mouseEnabled && !mouseChildren)) return false;
+			if (!hitObject.visible || __isMask || (interactiveOnly && !mouseEnabled && !mouseChildren)) return false;
 			if (mask != null && !mask.__hitTestMask (x, y)) return false;
 			
 			if (super.__hitTest (x, y, shapeFlag, stack, interactiveOnly, hitObject)) {
 				
 				return interactiveOnly;
 				
-			} else if ((!interactiveOnly || hitObject.mouseEnabled) && __graphics != null && __graphics.__hitTest (x, y, shapeFlag, __getWorldTransform ())) {
+			} else if ((!interactiveOnly || mouseEnabled) && __graphics != null && __graphics.__hitTest (x, y, shapeFlag, __getWorldTransform ())) {
 				
 				if (stack != null) {
 					
@@ -104,7 +103,7 @@ class Sprite extends DisplayObjectContainer {
 	}
 	
 	
-	@:noCompletion private override function __hitTestMask (x:Float, y:Float):Bool {
+	private override function __hitTestMask (x:Float, y:Float):Bool {
 		
 		if (super.__hitTestMask (x, y)) {
 			
@@ -128,7 +127,7 @@ class Sprite extends DisplayObjectContainer {
 	
 	
 	
-	@:noCompletion private function get_graphics ():Graphics {
+	private function get_graphics ():Graphics {
 		
 		if (__graphics == null) {
 			
@@ -142,7 +141,7 @@ class Sprite extends DisplayObjectContainer {
 	}
 	
 	
-	@:noCompletion private override function get_tabEnabled ():Bool {
+	private override function get_tabEnabled ():Bool {
 		
 		return (__tabEnabled || buttonMode);
 		
@@ -181,7 +180,6 @@ import openfl.media.SoundTransform;
 @:native("flash.display.Sprite")
 #end
 
-
 extern class Sprite extends DisplayObjectContainer {
 	
 	
@@ -217,14 +215,14 @@ extern class Sprite extends DisplayObjectContainer {
 	public var buttonMode:Bool;
 	
 	#if flash
-	@:noCompletion public var dropTarget (default, null):DisplayObject;
+	@:noCompletion @:dox(hide) public var dropTarget (default, null):DisplayObject;
 	#end
 	
 	/**
 	 * Specifies the Graphics object that belongs to this sprite where vector
 	 * drawing commands can occur.
 	 */
-	#if flash
+	#if (flash && !display)
 	public var graphics (default, null):Graphics;
 	#else
 	public var graphics (get, null):Graphics;
@@ -233,7 +231,7 @@ extern class Sprite extends DisplayObjectContainer {
 	public var hitArea:Sprite;
 	
 	#if flash
-	@:noCompletion public var soundTransform:SoundTransform;
+	@:noCompletion @:dox(hide) public var soundTransform:SoundTransform;
 	#end
 	
 	/**
@@ -291,7 +289,7 @@ extern class Sprite extends DisplayObjectContainer {
 	public function startDrag (lockCenter:Bool = false, bounds:Rectangle = null):Void;
 	
 	#if flash
-	@:noCompletion public function startTouchDrag (touchPointID:Int, lockCenter:Bool = false, bounds:Rectangle = null):Void;
+	@:noCompletion @:dox(hide) public function startTouchDrag (touchPointID:Int, lockCenter:Bool = false, bounds:Rectangle = null):Void;
 	#end
 	
 	/**
@@ -304,7 +302,7 @@ extern class Sprite extends DisplayObjectContainer {
 	public function stopDrag ():Void;
 	
 	#if flash
-	@:noCompletion public function stopTouchDrag (touchPointID:Int):Void;
+	@:noCompletion @:dox(hide) public function stopTouchDrag (touchPointID:Int):Void;
 	#end
 	
 	
